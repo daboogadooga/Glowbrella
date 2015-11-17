@@ -54,6 +54,7 @@ int botKnobDelta = 0;
 
 int EFFECT_STYLE = 0;       // zero means blank screen
 uint16_t color = 0xF800;    // Red by default
+static int brightness = 31; // batteries have limited sauce
 
 // Getter for top button pressed
 bool topButtonDown()
@@ -97,7 +98,7 @@ void setup() {
   randomSeed(1337); // because fuck you that's why
   Serial.begin(9600);
   matrix.begin();
-  matrix.setBrightness(31);    // Batteries have limited sauce
+  matrix.setBrightness(brightness);    // Batteries have limited sauce
 
   // Gettin' pinny with it
   pinMode(TOP_BUTTON_PIN, INPUT);
@@ -110,9 +111,10 @@ void setup() {
 
 // effects is an array of run functions, each can be stateful
 // the & is a reference to the function -- remember, runFn is a function pointer
-runFn effects[13] = {
+runFn effects[14] = {
   	&clear,
         &fill,
+        &music,
         &music2,
         &pulse,
         &party,
@@ -162,7 +164,8 @@ void loop()
   }
   if (topButtonDown())
   {
-    matrix.setBrightness(int(getBotKnob()/4));
+    brightness = int(getBotKnob()/4);
+    matrix.setBrightness(brightness);
   }
   
   // Dereference + grab current run function and tick it
