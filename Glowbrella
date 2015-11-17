@@ -555,8 +555,9 @@ int music2(int delta)
     matrix.drawFastVLine(i, 0, matrix.height(), color);
     matrix.drawFastVLine(i-1, 0, matrix.height(), 0);
     matrix.show();
+    i++;
   }
-  i++;
+  
   return 25;
 }
 
