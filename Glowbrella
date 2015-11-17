@@ -112,8 +112,8 @@ void setup() {
 // the & is a reference to the function -- remember, runFn is a function pointer
 runFn effects[13] = {
   	&clear,
-        &spiral,
-  	&fill,
+        &fill,
+        &music2,
         &pulse,
         &party,
         &partySolids,
@@ -122,7 +122,7 @@ runFn effects[13] = {
 	&theaterChase,
 	&theaterChaseRainbow,
 	&rainbow,
-        &music,
+        &spiral,
 	&chase
 };
 
@@ -151,9 +151,7 @@ void loop()
   unsigned long t = millis(); // Current elapsed time, milliseconds.
   int tickDelta = (int) (t - prevFrameTime);
   updateInputDeltas();
-  //color = int(getTopKnob()/4);
-  Serial.println("Sound: "+getSoundSensor());
-  Serial.println("BOT: "+getBotKnob());
+  color = Wheel(int(getTopKnob()/4));
   // Check if the button is pressed, if so advance current effect with loop
   if (botButtonDown())
   {
@@ -161,6 +159,10 @@ void loop()
     nextEffectTick = 0;
     clear(10);
     delay(300);
+  }
+  if (topButtonDown())
+  {
+    matrix.setBrightness(int(getBotKnob()/4));
   }
   
   // Dereference + grab current run function and tick it
@@ -512,10 +514,10 @@ int pulse(int delta)
 // Respond to some music my nigga'
 int music(int delta)
 {
-  static int brightnessMod = 100;
+  static int brightnessMod = 0;
 
   int sound = getSoundSensor();
- // Serial.println("MUSIC SENSOR:"+sound);  
+
   if (sound > 100)
   {
     brightnessMod = 100;
@@ -523,16 +525,36 @@ int music(int delta)
   
   if (brightnessMod > 0)
   {
+    matrix.fillScreen(color);
     matrix.setBrightness(brightnessMod);
     matrix.show();
-    brightnessMod--;
+    brightnessMod-=2;
+    
     if (brightnessMod <=0)
     {
       brightnessMod = 0;
+      clear(10);
     }
   }
-  
-  return 5;
+  return 0;
+}
+
+int music2(int delta)
+{
+  int sound = getSoundSensor();
+  static int i = matrix.width();
+  if (sound > 100)
+  {
+    i = 0;
+  }
+  if(i < matrix.width())
+  {
+    matrix.drawFastVLine(i, 0, matrix.height(), color);
+    matrix.drawFastVLine(i-1, 0, matrix.height(), 0);
+    matrix.show();
+  }
+  i++;
+  return 25;
 }
 
 int spiral(int delta)
